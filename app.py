@@ -1,17 +1,21 @@
+import os  
 from flask import Blueprint, render_template, request, redirect, Flask
 import psycopg2
+from dotenv import load_dotenv  
+
+load_dotenv()
 
 def create_app():
     app = Flask(__name__)
     app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://{user}:@{host}/{database}'
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-    app.secret_key = 'my_secret_key'  
+    
+    app.secret_key = os.getenv('SECRET_KEY', 'default_secret_key')  
 
     app.register_blueprint(rgr)
 
     return app
 
-# Определяем Blueprint с именем 'rgr'
 rgr = Blueprint('rgr', __name__)
 
 def dbConnect():
@@ -26,7 +30,6 @@ def dbClose(cursor, connection):
     cursor.close()
     connection.close()
 
-# Главная страница с отображением всех подписок
 @rgr.route('/', methods=['GET'])
 def main():
     conn = dbConnect()
@@ -36,12 +39,10 @@ def main():
     dbClose(cur, conn)
     return render_template('index.html', subscriptions=subscriptions)
 
-# Страница добавления подписки
 @rgr.route('/add_subscription')
 def add_subscription():
     return render_template('adding.html')
 
-# Сохранение новой подписки
 @rgr.route('/save_subscription', methods=['POST'])
 def save_subscription():
     name = request.form['name']
@@ -60,7 +61,6 @@ def save_subscription():
     conn.close()
     return redirect('/')
 
-# Страница редактирования подписки
 @rgr.route('/edit_subscription/<int:subscription_id>', methods=['GET'])
 def edit_subscription(subscription_id):
     conn = dbConnect()
@@ -73,7 +73,6 @@ def edit_subscription(subscription_id):
     else:
         return "Подписка не найдена", 404
 
-# Обновление подписки
 @rgr.route('/update_subscription/<int:subscription_id>', methods=['POST'])
 def update_subscription(subscription_id):
     name = request.form['name']
@@ -93,7 +92,6 @@ def update_subscription(subscription_id):
     conn.close()
     return redirect('/')
 
-# Удаление подписки
 @rgr.route('/delete_subscription/<int:subscription_id>')
 def delete_subscription(subscription_id):
     conn = dbConnect()
