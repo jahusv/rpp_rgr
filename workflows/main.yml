@@ -1,3 +1,31 @@
+name: CI Pipeline
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+      - name: install bandit 
+        run: pip install bandit
+      - name: security
+        run: bandit -r .
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
 # name: CI Pipeline
 # on:
 #   push:
@@ -68,30 +96,30 @@
 #           destination_dir: ${{ github.event.release.tag_name }}
 
       
-name: CI Pipeline
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
-jobs:
-  job:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.x'
-      - name: Install dependencies
-        run: |
-          python -m pip install --upgrade pip
-          pip install -r requirements.txt
-      - name: install bandit
-        run: pip install bandit
-      - name: security check
-        run: bandit -r .
+# name: CI Pipeline
+# on:
+#   push:
+#     branches:
+#       - main
+#   pull_request:
+#     branches:
+#       - main
+#   workflow_dispatch:
+# jobs:
+#   job:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - name: Checkout code
+#         uses: actions/checkout@v4
+#       - name: Set up Python
+#         uses: actions/setup-python@v4
+#         with:
+#           python-version: '3.x'
+#       - name: Install dependencies
+#         run: |
+#           python -m pip install --upgrade pip
+#           pip install -r requirements.txt
+#       - name: install bandit
+#         run: pip install bandit
+#       - name: security check
+#         run: bandit -r .
